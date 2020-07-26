@@ -1,0 +1,49 @@
+Current images.
+sudo docker images
+
+To convert current docker container into images use following command.
+sudo docker commit apache-container ubuntu-apache
+
+You will get this type of output:
+sha256:3077b281fddfe1815196c046f8dad16e90b44022fb0a3dad9e8bf39e222ea178
+
+Now see docker images. You can see newly created image as well.
+sudo docker images 
+
+Then save this image to some file.
+sudo docker save ubuntu-apache -o ubuntu-apache.tar
+
+To see the file.
+ls -lh | grep ubuntu-apache.tar
+
+To clear the current instance.
+sudo docker stop apache-container
+sudo docker stop mysql-container
+
+To remove containers.
+sudo docker container ls -a
+
+sudo docker container rm apache-container
+sudo docker container ls -a
+
+sudo docker container rm mysql-container
+sudo docker container ls -a
+
+To remove images.
+sudo docker images
+sudo docker rmi ubuntu
+sudo docker rmi ubuntu-apache
+sudo docker images
+
+
+To make Images from file that previous saved use following command.
+sudo docker load < ubuntu-apache.tar
+
+sudo chmod 666 ubuntu-apache.tar
+
+sudo docker load < ubuntu-apache.tar
+
+sudo docker images
+
+To create a container from the image use following command.
+sudo docker run -it ubuntu-apache
