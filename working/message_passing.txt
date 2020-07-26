@@ -1,0 +1,105 @@
+This is the continuation of the previous blog of build a Containerized Web Application on Azure(Click here to read the previous blog). In this blog, we will establish a connection between mysql-container and apache-container.
+
+Now watch those containers with this command:
+watch 'sudo docker ps -a'
+
+If mysql-container stops then restart it using following command:
+sudo docker start mysql-container
+
+Open the mysql-container shell using the following command and check the status of the mySQL service.
+sudo docker exec -it mysql-container bash 
+service mysql status
+
+If mySQL service is not running then start it using the following command:
+service mysql start
+
+Check mysql password.
+mysql -uroot -p
+
+We have installed the network tools in the apache-container. Now install the network tools in the mysql-container.
+apt install inetutils-ping net-tools -y
+
+Cheking Ping
+Check network cards in the mysql-container.
+ifconfig
+And note down the IPaddress of the mysql-container and exit from this container and move to host machine. In my case, It is 172.17.0.2.
+
+
+Check apache-container is running or not. If apache-container is not running then start the apache container.
+sudo docker start apache-container
+
+Now open the apache-container shell and ping the mysql-container on the IPaddress and check everything is working fine or not. 
+sudo docker exec -it apache-container bash
+ping 172.117.0.2
+
+Now note down the IPaddress of the apache-container and exit from this container and move to host machine.
+ifconfig
+In my case, It is 172.17.0.3.
+
+And then open the mysql-container shell and then ping the apache-container and check everything is working fine or not. 
+sudo docker exec -it mysql-container bash
+ping 172.17.0.3
+exit 
+
+Configuration Setting
+Now come to the apache container and Now open the apache-container shell.
+sudo docker exec -it apache-container bash
+
+Now connect mysql database to the php. Open the index.php file with using following command:
+vi /var/www/html/index.php
+
+And add this code in this file.
+
+<?php
+    $server = "172.17.0.2";
+    $username = "root";
+    $pass = "root123!";
+    $dbname = "mysql";
+
+    $con = new MySQLi($server, $username, $pass, $dbname);
+
+    if ($con->connect_error)
+        echo "Error: ".$con->connect_error;
+    else
+        echo "connected";
+?>
+
+Start the apache server first with the following command:
+service apache2 start
+
+To check apache is listening on what addresses.
+netstat -nutlp
+
+Exit from the apache container and go to mysql-container.And check the listening ports.
+sudo docker exec -it mysql-container bash
+netstat -nutlp
+
+MySQL by default accepting only from local host. So we have to change it to listen from the apache-container as well.
+
+So by doing this you have to change in conf and conf is in the /etc/mysql and you have to search for it.
+grep -r "bind-address" /etc/mysql/
+
+You will get this output.
+/etc/mysql/mysql.conf.d/mysqld.cnf:bind-address		= 127.0.0.1
+
+Now open the file using the path as described in the above output.
+vi /etc/mysql/mysql.conf.d/mysqld.cnf
+
+Now change bind addresses to listen from all ports.
+bind-addresses = 0.0.0.0
+
+Now restart the mysql server.
+service mysql restart
+
+To check the mysql listening addresses.
+netstat -nutlp
+
+
+Change mysql user setting from local host to the  remote network.
+mysql -uroot -p
+
+CREATE USER 'test'@'172.17.0.3' IDENTIFIED BY 'test123!';
+GRANT ALL PRIVILEGES ON mysql.* TO 'root'@'172.17.0.3' WITH GRANT OPTION;
+
+Now all connection is good but you have to use the security as well in above command.
+
