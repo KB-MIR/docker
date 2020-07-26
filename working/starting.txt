@@ -1,0 +1,101 @@
+In this blog, I am going to setup mysql server in one container and apache2 in other container and If you are not familiar with Docker, read my this blog first(Click here to read the blog). Moreover, this all will be done on Azuer virtual machine, If you are not familiar with Azure virtual machine, please read my this blog first to create the virtual machine on Azure(Click here to read the blog).
+Setting Up Docker
+To install Docker, use the following command:
+sudo apt install docker.io
+
+
+To start docker, command is given below:
+sudo systemctl start docker
+
+To start docker, when you start the ubuntu use this command:
+sudo systemctl enable docker
+
+To view current images, use the following command:
+sudo docker images
+
+To pull images, use the following command:
+sudo docker pull ubuntu
+
+
+Creating mysql container 
+We have already downloaded the ubuntu images. Now using this ubuntu image we will create the container and named it mysql-container. Because we are going to install mysql database in it. 
+sudo docker run --name mysql-container -it ubuntu
+
+Now you are in mysql-container, execute the following comand to set the environment and install the vim for editing.
+apt update
+apt install vim -y
+exit
+
+ 
+If you want to see which container in running on your host machine use this command: 
+sudo docker ps -a 
+
+
+If you want to check consistently use this command.
+watch 'sudo docker ps -a'
+
+
+Now in Host machine open the terminal and start the mysql-container.
+sudo docker start mysql-container
+
+To get bash shell of mysql-container, command is given below.
+sudo docker exec -it mysql-container bash
+
+Now in mysql-container install the mysql-server and start the mysql service.
+apt install mysql-server -y
+service mysql start 
+
+
+Now in mysql create root user protected with password. Now your database is secured.
+mysql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root123!';
+FLUSH PRIVILEGES;
+\q
+
+Now if you start mysql it will ask for password.
+mysql -uroot -p 
+Then enter password. Don't enter password on command line for security reasons.
+
+
+Creating apache container
+To create the apache-container, we use the same image as used in mysql-container.
+sudo docker run --name apache-container -it ubuntu 
+exit
+
+Now container is created and now come in Host machine open the terminal and start the apache-container.
+sudo docker start apache-container
+
+Now apache container is running now execute following command on container to get the bash terminal.
+sudo docker exec -it apache-container bash 
+
+Now you are in apache container, first thing is to update and then install the apache2. 
+apt update
+apt install apache2 
+
+After installing the apache2 service start the service with the following command:
+service apache2 start
+
+Install the important editor and the important libraries to make a connection with php and mysql.
+apt install vim -y 
+apt install php libapache2-mod-php php-cli php-mysql -y 
+
+Now install network tools, with the following command:
+apt install inetutils-ping net-tools -y 
+ifconfig
+
+To check Active internet connection and ports.
+netstat -nutlp
+
+To add files on your site.
+vi /var/www/html/index.php
+
+When you update some thing in code you need to restart the apache2, to get the effects of changes.
+service apache2 restart
+
+
+That's for now in next blog, I am going to setup a connection between these two containers.
+
+
+
+
+
