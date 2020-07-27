@@ -99,7 +99,7 @@ Change mysql user setting from local host to the  remote network.
 mysql -uroot -p
 
 CREATE USER 'test'@'172.17.0.3' IDENTIFIED BY 'test123!';
-GRANT ALL PRIVILEGES ON mysql.* TO 'root'@'172.17.0.3' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON mysql.* TO 'test'@'172.17.0.3' WITH GRANT OPTION;
 
 Now all connection is good but you have to use the security as well in above command.
 
