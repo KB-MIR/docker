@@ -47,3 +47,12 @@ sudo docker images
 
 To create a container from the image use following command.
 sudo docker run -it ubuntu-apache
+
+
+To start the docker container using the host network. in other words mapping port of host machine directly to container ports.
+sudo docker run --rm -d --network host --name apache-container -it ubuntu-apache
+
+ubuntu-apache is an image.
+apache-container is the name of the container.
+-d for running in background
+--rm to remove the current container.
